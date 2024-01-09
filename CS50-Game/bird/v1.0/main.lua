@@ -21,3 +21,31 @@
     Author: Felix Ho
 ]]
 
+-- include packages
+Push = require 'package/push'
+Class = require 'package/class'
+
+-- include classes
+require 'Bird'
+
+-- define screen resolution
+WINDOW_WIDTH = 1280
+WINDOW_HEIGHT = 720
+VIRTUAL_WIDTH = 512
+VIRTUAL_HEIGHT = 288
+
+function love.load()
+end
+
+function love.resize(w, h)
+    Push:resize(w, h)
+end
+
+function love.keypressed(key)
+end
+
+function love.update(dt)
+end
+
+function love.draw()
+end
