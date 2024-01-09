@@ -10,6 +10,8 @@
 
 Bird = Class{}
 
+local GRAVITY = 20
+
 function Bird:init()
     -- set bird image, widht and height
     self.image = love.graphics.newImage('image/bird.png')
@@ -19,6 +21,22 @@ function Bird:init()
     -- set bird dropping location
     self.x = VIRTUAL_WIDTH / 2 - self.width / 2
     self.y = VIRTUAL_HEIGHT / 2 - self.height / 2
+
+    -- set bird velocity on y-axis
+    self.dy = 0
+end
+
+function Bird:update(dt)
+    -- Implement gravity, makes velocity increases as bird moving down
+    self.dy = self.dy + GRAVITY * dt
+
+    -- add a burst of negative gravity if we hit space
+    if love.keyboard.wasPressed('space') then
+        self.dy = -5
+    end
+
+    -- apply current velocity to y-axis
+    self.y = self.y + self.dy
 end
 
 function Bird:render()

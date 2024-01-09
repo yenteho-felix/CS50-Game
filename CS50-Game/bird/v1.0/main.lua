@@ -27,6 +27,7 @@ Class = require 'package/class'
 
 -- include classes
 require 'Bird'
+require 'Pipe'
 
 -- define screen resolution
 WINDOW_WIDTH = 1280
@@ -49,7 +50,24 @@ local GROUND_LOOPING_POINT = ground:getWidth() / 2
 -- bird sprite
 local bird = Bird()
 
+-- table of spawning Pipes
+local pipes = {}
 
+-- timer of spawning Pipes
+local spawnTimer = 0
+
+-- initialize input table 'keysPressed'
+love.keyboard.keysPressed = {}
+
+-- FUNCTIONS --
+--[[
+    function to check if a key is pressed in last frame
+]]
+function love.keyboard.wasPressed(key)
+    return love.keyboard.keysPressed[key]
+end
+
+-- MAIN --
 function love.load()
     -- sceme title, resolution
     love.window.setTitle('Fifty Bird')
@@ -59,6 +77,9 @@ function love.load()
         fullscreen = false,
         resizable = true,
     })
+
+    -- seed the RNG
+    math.randomseed(os.time())
 end
 
 function love.resize(w, h)
@@ -69,6 +90,9 @@ function love.keypressed(key)
     if key == 'escape' then
         love.event.quit()
     end
+
+    -- add to keysPressed table when keys pressed in this frame
+    love.keyboard.keysPressed[key] = true
 end
 
 function love.update(dt)
@@ -77,6 +101,30 @@ function love.update(dt)
 
     -- scroll ground by present speed * dt, looping back to 0 after the looping point
     groundScroll = (groundScroll + GROUND_SCROLL_SPEED * dt) % GROUND_LOOPING_POINT
+
+    -- update bird's location
+    bird:update(dt)
+
+    -- reset keysPressed table every frame
+    love.keyboard.keysPressed = {}
+
+    -- spawn pipe every 2 seconds
+    spawnTimer = spawnTimer + dt
+    if spawnTimer > 2 then
+        table.insert(pipes, Pipe())
+        print('Added new pipe!')
+        spawnTimer = 0
+    end
+
+    -- update pipe location
+    for k, pipe in pairs(pipes) do
+        pipe:update(dt)
+
+        -- remove pipe from the scene when it is no longer visiable
+        if pipe.x < -pipe.width then
+            table.remove(pipes, k)
+        end
+    end
 end
 
 function love.draw()
@@ -84,6 +132,11 @@ function love.draw()
 
     -- draw the background at the negative looping point
     love.graphics.draw(background, -backgroundScroll, 0)
+
+    -- render all the pipes
+    for k, pipe in pairs(pipes) do
+        pipe:render()
+    end
 
     -- draw the ground on top of background, toward the bottom of the screen at the negative looping point
     love.graphics.draw(ground, -groundScroll, VIRTUAL_HEIGHT - ground:getHeight())
