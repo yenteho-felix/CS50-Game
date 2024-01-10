@@ -14,19 +14,33 @@ Pipe = Class{}
 -- image defined here will be loaded once, not per instantiation to save memory
 local PIPE_IMAGE = love.graphics.newImage('image/pipe.png')
 
-local PIPE_SCROLL = -60
+-- define global variables to be used by other classes
+PIPE_SPEED = 60
+PIPE_HEIGHT = PIPE_IMAGE:getHeight()
+PIPE_WIDTH = PIPE_IMAGE:getWidth()
 
-function Pipe:init()
-    -- pipe should be spawn outside the sceme
+-- two variables
+-- 1. orientation of the pipe
+-- 2. y-axis of the pipe
+function Pipe:init(orientation, y)
     self.x = VIRTUAL_WIDTH
-    self.y = math.random(VIRTUAL_HEIGHT / 4, (VIRTUAL_HEIGHT / 4 ) * 3)
-    self.width = PIPE_IMAGE:getWidth()
+    self.y = y
+    self.width = PIPE_WIDTH
+    self.height = PIPE_HEIGHT
+    self.orientation = orientation
 end
 
 function Pipe:update(dt)
-    self.x = self.x + PIPE_SCROLL * dt
 end
 
 function Pipe:render()
-    love.graphics.draw(PIPE_IMAGE, math.floor(self.x + 0.5), math.floor(self.y))
+    love.graphics.draw(
+        PIPE_IMAGE,
+        self.x,
+        (self.orientation == 'top' and self.y + self.height or self.y),     -- set y-axis based on whether the pipe is on top or bottom
+                                                                            -- since top pipe will be mirrored so its y-axis should be adjusted by pipe height
+        0,                                                                  -- orientation
+        1,                                                                  -- scale factor x-axis
+        (self.orientation == 'top' and -1 or 1)                             -- scale factor y-axis. mirror the top pipe by setting -1.
+    )
 end

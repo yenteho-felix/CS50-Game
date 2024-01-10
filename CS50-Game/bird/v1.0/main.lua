@@ -28,6 +28,10 @@ Class = require 'package/class'
 -- include classes
 require 'Bird'
 require 'Pipe'
+require 'PipePair'
+
+-- seed the RNG
+math.randomseed(os.time())
 
 -- define screen resolution
 WINDOW_WIDTH = 1280
@@ -50,8 +54,8 @@ local GROUND_LOOPING_POINT = ground:getWidth() / 2
 -- bird sprite
 local bird = Bird()
 
--- table of spawning Pipes
-local pipes = {}
+-- table of spawning PipePairs
+local pipePairs = {}
 
 -- timer of spawning Pipes
 local spawnTimer = 0
@@ -59,7 +63,12 @@ local spawnTimer = 0
 -- initialize input table 'keysPressed'
 love.keyboard.keysPressed = {}
 
--- FUNCTIONS --
+-- record Y-axis of the new pipe
+-- we like to place the top pipe at 0 y-axis plus some random distance between 0 to 200
+-- location of the pipePairs needed to be adjusted by the pipe height (minus) since we mirrored the top pipe
+local lastY = math.random(150) - PIPE_HEIGHT
+
+------ FUNCTIONS ------
 --[[
     function to check if a key is pressed in last frame
 ]]
@@ -67,7 +76,7 @@ function love.keyboard.wasPressed(key)
     return love.keyboard.keysPressed[key]
 end
 
--- MAIN --
+------ MAIN ------
 function love.load()
     -- sceme title, resolution
     love.window.setTitle('Fifty Bird')
@@ -77,9 +86,6 @@ function love.load()
         fullscreen = false,
         resizable = true,
     })
-
-    -- seed the RNG
-    math.randomseed(os.time())
 end
 
 function love.resize(w, h)
@@ -111,18 +117,34 @@ function love.update(dt)
     -- spawn pipe every 2 seconds
     spawnTimer = spawnTimer + dt
     if spawnTimer > 2 then
-        table.insert(pipes, Pipe())
-        print('Added new pipe!')
+
+        -- opening of the pipe (GAP) should be 0 pixel below top screen and PIPE_GAP above bottom screen
+        local minY = -PIPE_HEIGHT
+        local maxY = VIRTUAL_HEIGHT - PIPE_GAP - PIPE_HEIGHT
+        local y = lastY + math.random(-PIPE_DELTA/2, PIPE_DELTA/2)
+
+        if y < minY then
+            y = minY
+        end
+        if y > maxY then
+            y = maxY
+        end
+        lastY = y
+
+        table.insert(pipePairs, PipePair(y))
+        print('Added new pipePair!')
         spawnTimer = 0
     end
 
-    -- update pipe location
-    for k, pipe in pairs(pipes) do
-        pipe:update(dt)
+    -- update pipePairs location
+    for k, pipePair in pairs(pipePairs) do
+        pipePair:update(dt)
+    end
 
-        -- remove pipe from the scene when it is no longer visiable
-        if pipe.x < -pipe.width then
-            table.remove(pipes, k)
+    -- remove any flagged pipes
+    for k, pipePair in pairs(pipePairs) do
+        if pipePair.remove then
+            table.remove(pipePair, k)
         end
     end
 end
@@ -133,9 +155,9 @@ function love.draw()
     -- draw the background at the negative looping point
     love.graphics.draw(background, -backgroundScroll, 0)
 
-    -- render all the pipes
-    for k, pipe in pairs(pipes) do
-        pipe:render()
+    -- render all the pipePairs
+    for k, pipePair in pairs(pipePairs) do
+        pipePair:render()
     end
 
     -- draw the ground on top of background, toward the bottom of the screen at the negative looping point
