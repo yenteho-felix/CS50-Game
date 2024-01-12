@@ -1,4 +1,6 @@
 --[[
+    GD50 - Flappy Bird Remake
+    
     Pipe Class
 
     The Pipe class represents the pipes that randomly spawn in our game, which act as our primary obstacles.

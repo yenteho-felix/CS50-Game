@@ -1,4 +1,6 @@
 --[[
+    GD50 - Flappy Bird Remake
+
     PipePair Class
 
     Used to represent a pair of pipes that stick together as they scroll, providing an opening
@@ -17,21 +19,29 @@ PIPE_DELTA = 50
 
 -- y variable defines the y-axis of pipePair
 function PipePair:init(y)
+    -- pipe pair should be initialized outside of the right edge of the screen
+    -- x value is the width of screen
+    -- y value is the topmost pipe
     self.x = VIRTUAL_WIDTH
     self.y = y
+
     -- create pipe pair
     self.pipes = {
         ['upper'] = Pipe('top', self.y),
         ['lower'] = Pipe('bottom', self.y + PIPE_HEIGHT + PIPE_GAP)
     }
+
     -- whether this pipe pair is ready to be removed fromt he scene
     self.remove = false
+
+    -- flag to hold whether this pair has been scored
+    self.score = false
 end
 
 function PipePair:update(dt)
     -- remove the pipe from the scene if it's beyong the left edge of the screen
     -- else move it from right to left
-    if self.x > -PIPE_WIDTH then
+    if self.x > 0 - PIPE_WIDTH then
         self.x = self.x -PIPE_SPEED * dt
         self.pipes['lower'].x = self.x
         self.pipes['upper'].x = self.x

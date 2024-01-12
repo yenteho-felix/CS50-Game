@@ -1,4 +1,6 @@
 --[[
+    GD50 - Flappy Bird Remake
+
     Bird Class
 
     The Bird is what we control in the game via clicking or the space bar; whenever we press either,
@@ -19,12 +21,23 @@ function Bird:init()
     self.width = self.image:getWidth()
     self.height = self.image:getHeight()
 
-    -- set bird dropping location
+    -- set bird dropping location at middle of the screen
     self.x = VIRTUAL_WIDTH / 2 - self.width / 2
     self.y = VIRTUAL_HEIGHT / 2 - self.height / 2
 
     -- set bird velocity on y-axis
     self.dy = 0
+end
+
+function Bird:collides(pipe)
+    -- Shrink bird by few pixels to give the player a little leeway with the collision
+    local leeway = 3
+    if (self.x + self.width - leeway) >= pipe.x and (self.x + leeway) <= (pipe.x + pipe.width) then
+        if (self.y + self.height - leeway) >= pipe.y and (self.y + leeway) <= (pipe.y + pipe.height) then
+            return true
+        end
+    end
+    return false
 end
 
 function Bird:update(dt)
@@ -34,6 +47,7 @@ function Bird:update(dt)
     -- add a burst of negative gravity if we hit space
     if love.keyboard.wasPressed('space') then
         self.dy = -BURST
+        sounds['jump']:play()
     end
 
     -- apply current velocity to y-axis

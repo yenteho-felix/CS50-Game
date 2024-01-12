@@ -1,6 +1,5 @@
 --[[
-    GD50
-    Flappy Bird Remake
+    GD50 - Flappy Bird Remake
     
     A mobile game by Dong Nguyen that went viral in 2013, utilizing a very simple 
     but effective gameplay mechanic of avoiding pipes indefinitely by just tapping 
@@ -26,9 +25,12 @@ Push = require 'package/push'
 Class = require 'package/class'
 
 -- include classes
-require 'Bird'
-require 'Pipe'
-require 'PipePair'
+require 'StateMachine'
+require 'states/BaseState'
+require 'states/CountdownState'
+require 'states/PlayState'
+require 'states/TitleScreenState'
+require 'states/ScoreState'
 
 -- seed the RNG
 math.randomseed(os.time())
@@ -51,30 +53,9 @@ local groundScroll = 0
 local GROUND_SCROLL_SPEED = BACKGROUND_SCROLL_SPEED * 2
 local GROUND_LOOPING_POINT = ground:getWidth() / 2
 
--- bird sprite
-local bird = Bird()
+-- globla variable we use to scroll the map
+scrolling = true
 
--- table of spawning PipePairs
-local pipePairs = {}
-
--- timer of spawning Pipes
-local spawnTimer = 0
-
--- initialize input table 'keysPressed'
-love.keyboard.keysPressed = {}
-
--- record Y-axis of the new pipe
--- we like to place the top pipe at 0 y-axis plus some random distance between 0 to 200
--- location of the pipePairs needed to be adjusted by the pipe height (minus) since we mirrored the top pipe
-local lastY = math.random(150) - PIPE_HEIGHT
-
------- FUNCTIONS ------
---[[
-    function to check if a key is pressed in last frame
-]]
-function love.keyboard.wasPressed(key)
-    return love.keyboard.keysPressed[key]
-end
 
 ------ MAIN ------
 function love.load()
@@ -86,10 +67,45 @@ function love.load()
         fullscreen = false,
         resizable = true,
     })
+
+    -- initialize text fonts
+    smallFont = love.graphics.newFont('font/font.ttf', 8)
+    mediumFont = love.graphics.newFont('font/flappy.ttf', 14)
+    hugeFont = love.graphics.newFont('font/flappy.ttf', 56)
+    titleFont = love.graphics.newFont('font/flappy.ttf', 28)
+    love.graphics.setFont(titleFont)
+
+    -- initialize state machine
+    gStateMachine = StateMachine {
+        ['title'] = function() return TitleScreenState() end,
+        ['countdown'] = function() return CountdownState() end,
+        ['play'] = function() return PlayState() end,
+        ['score'] = function() return ScoreState() end,
+    }
+    gStateMachine:change('title')
+
+    -- initialize sounds
+    sounds = {
+        ['jump'] = love.audio.newSource('sounds/jump.wav', 'static'),
+        ['explosion'] = love.audio.newSource('sounds/explosion.wav', 'static'),
+        ['hurt'] = love.audio.newSource('sounds/hurt.wav', 'static'),
+        ['score'] = love.audio.newSource('sounds/score.wav', 'static'),
+        ['music'] = love.audio.newSource('sounds/marios_way.mp3', 'static'),
+    }
+    sounds['music']:setLooping(true)
+    sounds['music']:play()
+
+    -- initialize input table 'keysPressed'
+    love.keyboard.keysPressed = {}
 end
 
 function love.resize(w, h)
     Push:resize(w, h)
+end
+
+-- function to check if a key is pressed in last frame
+function love.keyboard.wasPressed(key)
+    return love.keyboard.keysPressed[key]
 end
 
 function love.keypressed(key)
@@ -102,51 +118,19 @@ function love.keypressed(key)
 end
 
 function love.update(dt)
-    -- scroll background by present speed * dt, looping back to 0 after the looping point
-    backgroundScroll = (backgroundScroll + BACKGROUND_SCROLL_SPEED * dt) % BACKGROUND_LOOPING_POINT
+    if scrolling then
+        -- scroll background by present speed * dt, looping back to 0 after the looping point
+        backgroundScroll = (backgroundScroll + BACKGROUND_SCROLL_SPEED * dt) % BACKGROUND_LOOPING_POINT
 
-    -- scroll ground by present speed * dt, looping back to 0 after the looping point
-    groundScroll = (groundScroll + GROUND_SCROLL_SPEED * dt) % GROUND_LOOPING_POINT
+        -- scroll ground by present speed * dt, looping back to 0 after the looping point
+        groundScroll = (groundScroll + GROUND_SCROLL_SPEED * dt) % GROUND_LOOPING_POINT
+    end
 
-    -- update bird's location
-    bird:update(dt)
+    -- update the state machine, which defers to the right state
+    gStateMachine:update(dt)
 
     -- reset keysPressed table every frame
     love.keyboard.keysPressed = {}
-
-    -- spawn pipe every 2 seconds
-    spawnTimer = spawnTimer + dt
-    if spawnTimer > 2 then
-
-        -- opening of the pipe (GAP) should be 0 pixel below top screen and PIPE_GAP above bottom screen
-        local minY = -PIPE_HEIGHT
-        local maxY = VIRTUAL_HEIGHT - PIPE_GAP - PIPE_HEIGHT
-        local y = lastY + math.random(-PIPE_DELTA/2, PIPE_DELTA/2)
-
-        if y < minY then
-            y = minY
-        end
-        if y > maxY then
-            y = maxY
-        end
-        lastY = y
-
-        table.insert(pipePairs, PipePair(y))
-        print('Added new pipePair!')
-        spawnTimer = 0
-    end
-
-    -- update pipePairs location
-    for k, pipePair in pairs(pipePairs) do
-        pipePair:update(dt)
-    end
-
-    -- remove any flagged pipes
-    for k, pipePair in pairs(pipePairs) do
-        if pipePair.remove then
-            table.remove(pipePair, k)
-        end
-    end
 end
 
 function love.draw()
@@ -155,16 +139,11 @@ function love.draw()
     -- draw the background at the negative looping point
     love.graphics.draw(background, -backgroundScroll, 0)
 
-    -- render all the pipePairs
-    for k, pipePair in pairs(pipePairs) do
-        pipePair:render()
-    end
+    -- render other objects based on their state
+    gStateMachine:render()
 
     -- draw the ground on top of background, toward the bottom of the screen at the negative looping point
     love.graphics.draw(ground, -groundScroll, VIRTUAL_HEIGHT - ground:getHeight())
-
-    -- draw the bird sprite
-    bird:render()
 
     Push:finish()
 end
