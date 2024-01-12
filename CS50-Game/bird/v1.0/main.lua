@@ -50,11 +50,12 @@ local BACKGROUND_LOOPING_POINT = 413
 -- ground image. ground should move faster than background
 local ground = love.graphics.newImage('image/ground.png')
 local groundScroll = 0
-local GROUND_SCROLL_SPEED = BACKGROUND_SCROLL_SPEED * 2
+GROUND_SCROLL_SPEED = BACKGROUND_SCROLL_SPEED * 2           -- Use as pipe scrolling speed as well
 local GROUND_LOOPING_POINT = ground:getWidth() / 2
 
 -- globla variable we use to scroll the map
 scrolling = true
+
 
 
 ------ MAIN ------

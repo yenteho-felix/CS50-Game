@@ -17,10 +17,16 @@ require 'Bird'
 require 'Pipe'
 require 'PipePair'
 
+-- local variables to display scoring medal
+local medal = love.graphics.newImage('image/medal.png')
+local scored = false
+local count = 0
+
 function PlayState:init()
     self.bird = Bird()
     self.pipePairs = {}
     self.spawnTimer = 0
+    self.spawnInterval = 2
     self.score = 0
 
     -- record Y-axis of the new pipe
@@ -60,17 +66,23 @@ function PlayState:update(dt)
         -- update timer
         self.spawnTimer = self.spawnTimer + dt
 
-        -- spawn pipe every 2 seconds
-        if self.spawnTimer > 2 then
+        -- spawn pipe every 2 or 3 seconds
+        if self.spawnTimer > self.spawnInterval then
+            -- the maximum delta height between two continuous pipePairs
+            local delta = math.random(40, 60)
+            if math.random(-1,1) < 0 then
+                delta = 0 - delta
+            end
 
             -- opening of the pipe (GAP) should be 0 pixel below top screen and PIPE_GAP above bottom screen
             local minY = -PIPE_HEIGHT
-            local maxY = VIRTUAL_HEIGHT - PIPE_GAP - PIPE_HEIGHT
-            local y = math.max(minY, math.min(self.lastY + math.random(-PIPE_DELTA/2, PIPE_DELTA/2), maxY))
+            local maxY = VIRTUAL_HEIGHT - PipePair(0).gap - PIPE_HEIGHT
+            local y = math.max(minY, math.min(self.lastY + delta, maxY))
             self.lastY = y
             table.insert(self.pipePairs, PipePair(y))
 
             self.spawnTimer = 0
+            self.spawnInterval = math.floor(math.random(2,3) + 0.5)
         end
 
         -- for every pair of pipes
@@ -82,6 +94,8 @@ function PlayState:update(dt)
                     self.score = self.score + 1
                     pair.scored = true
                     sounds['score']:play()
+
+                    scored = true
                 end
             end
 
@@ -105,6 +119,11 @@ function PlayState:update(dt)
         -- reset game if bird gets to the ground
         CollideWithGround(self.bird, self.score)
     end
+
+    -- pause game
+    if love.keyboard.wasPressed('insert') then
+        scrolling = not scrolling
+    end
 end
 
 function PlayState:render()
@@ -117,8 +136,28 @@ function PlayState:render()
     self.bird:render()
 
     -- render score
-    love.graphics.setFont(titleFont)
-    love.graphics.print('Score: ' .. tostring(self.score), 8, 8)
+
+    love.graphics.setFont(mediumFont)
+    love.graphics.printf('Score: ' .. tostring(self.score), 8, 8, VIRTUAL_WIDTH, 'left')
+
+    -- render medal when scroing, disply for 30 frame (about 0.5s)
+    if scored then      
+        love.graphics.draw(medal, self.bird.x + (self.bird.width - medal:getWidth()) / 2, self.bird.y - self.bird.height - 5)
+        count = count + 1
+        if count > 30 then
+            scored = false
+            count = 0
+        end
+    end
+
+    -- render instruction
+    love.graphics.printf('Enter "Insert" to Pause Game!', 8, VIRTUAL_HEIGHT - 32, VIRTUAL_WIDTH, 'left')
+
+    -- pause message
+    if scrolling == false then
+        love.graphics.setFont(hugeFont)
+        love.graphics.printf('Game Paused', 0, 120, VIRTUAL_WIDTH, 'center')
+    end
 end
 
 -- called when this state is transitioned from another state

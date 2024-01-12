@@ -11,12 +11,6 @@
 
 PipePair = Class{}
 
--- size of the gap between tio and bottom pipes
-PIPE_GAP = 100
-
--- the maximum delta height between two continuous pipePairs
-PIPE_DELTA = 50
-
 -- y variable defines the y-axis of pipePair
 function PipePair:init(y)
     -- pipe pair should be initialized outside of the right edge of the screen
@@ -25,10 +19,13 @@ function PipePair:init(y)
     self.x = VIRTUAL_WIDTH
     self.y = y
 
-    -- create pipe pair
+    -- size of the gap between tio and bottom pipes
+    self.gap = math.random(90, 120)
+
+    -- create pipe pairs
     self.pipes = {
         ['upper'] = Pipe('top', self.y),
-        ['lower'] = Pipe('bottom', self.y + PIPE_HEIGHT + PIPE_GAP)
+        ['lower'] = Pipe('bottom', self.y + self.gap + PIPE_HEIGHT)
     }
 
     -- whether this pipe pair is ready to be removed fromt he scene
@@ -42,7 +39,7 @@ function PipePair:update(dt)
     -- remove the pipe from the scene if it's beyong the left edge of the screen
     -- else move it from right to left
     if self.x > 0 - PIPE_WIDTH then
-        self.x = self.x -PIPE_SPEED * dt
+        self.x = self.x - GROUND_SCROLL_SPEED * dt
         self.pipes['lower'].x = self.x
         self.pipes['upper'].x = self.x
     else

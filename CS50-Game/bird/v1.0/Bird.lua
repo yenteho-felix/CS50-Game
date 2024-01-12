@@ -12,10 +12,11 @@
 
 Bird = Class{}
 
-local GRAVITY = 20
-local BURST = 5
-
 function Bird:init()
+    -- set bird gravity and burst force
+    self.gravity = 15
+    self.burst = 4
+
     -- set bird image, widht and height
     self.image = love.graphics.newImage('image/bird.png')
     self.width = self.image:getWidth()
@@ -42,11 +43,11 @@ end
 
 function Bird:update(dt)
     -- Implement gravity, makes velocity increases as bird moving down
-    self.dy = self.dy + GRAVITY * dt
+    self.dy = self.dy + self.gravity * dt
 
     -- add a burst of negative gravity if we hit space
     if love.keyboard.wasPressed('space') then
-        self.dy = -BURST
+        self.dy = -self.burst
         sounds['jump']:play()
     end
 

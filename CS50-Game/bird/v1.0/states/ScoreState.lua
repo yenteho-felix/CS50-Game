@@ -30,7 +30,17 @@ function ScoreState:render()
     love.graphics.setFont(mediumFont)
     love.graphics.printf('Score: ' .. tostring(self.score), 0, 100, VIRTUAL_WIDTH, 'center')
 
+    local medal = love.graphics.newImage('image/medal.png')
+    local medalX = VIRTUAL_WIDTH / 2 - medal:getWidth() / 2 - self.score * 5 / 2
+    for i=1, self.score do 
+        love.graphics.draw(medal, medalX , 120)
+        medalX = medalX + 5
+    end
+
     love.graphics.printf('Press "Enter" to Play Again!', 0, 160, VIRTUAL_WIDTH, 'center')
+
+
+
 end
 
 -- when we enter the score state, we expect to receive the score

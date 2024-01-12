@@ -17,7 +17,6 @@ Pipe = Class{}
 local PIPE_IMAGE = love.graphics.newImage('image/pipe.png')
 
 -- define global variables to be used by other classes
-PIPE_SPEED = 60
 PIPE_HEIGHT = PIPE_IMAGE:getHeight()
 PIPE_WIDTH = PIPE_IMAGE:getWidth()
 
