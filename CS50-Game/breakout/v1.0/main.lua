@@ -53,6 +53,11 @@ function love.load()
         ['particle'] = love.graphics.newImage('images/particle.png')      
     }
 
+    -- Quads we will generate for all of our textures
+    gFrames = {
+        ['paddles'] = GenerateQuadsPaddles(gTextures['main'])
+    }
+
     -- initialize sounds
     gSounds = {
         ['paddle-hit'] = love.audio.newSource('sounds/paddle_hit.wav', 'static'),
@@ -74,7 +79,8 @@ function love.load()
 
     -- initialize state machines
     gStateMachine = StateMachine {
-        ['start'] = function() return StartState() end
+        ['start'] = function() return StartState() end,
+        ['play'] = function() return PlayState() end,
     }
     gStateMachine:change('start')
 

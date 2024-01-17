@@ -15,15 +15,15 @@ Push = require 'lib/push'
 -- https://github.com/vrld/hump/blob/master/class.lua
 Class = require 'lib/class'
 
--- a few global constants, centralized
+-- Classes developed for this main program
 require 'src/constants'
-
--- a basic StateMachine class which will allow us to transition to and from
--- game states smoothly and avoid monolithic code in one file
-require 'src/StateMachine'
+require 'src/Paddle'
+require 'src/Utils'
 
 -- each of the individual states our game can be in at once; each state has
 -- its own update and render methods that can be called by our state machine
 -- each frame, to avoid bulky code in main.lua
+require 'src/StateMachine'
 require 'src/states/BaseState'
 require 'src/states/StartState'
+require 'src/states/PlayState'

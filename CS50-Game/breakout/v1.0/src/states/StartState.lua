@@ -41,6 +41,15 @@ function keyboardHandling()
         gSounds['paddle-hit']:play()
     end
 
+    -- enter the game option when 'enter' or 'return' key wasPressed
+    if love.keyboard.wasPressed('return') or love.keyboard.wasPressed('enter') then
+        gSounds['confirm']:play()
+
+        if highlighted == 1 then
+            gStateMachine:change('play')
+        end
+    end
+
     -- quit if we press an escape key
     if love.keyboard.wasPressed('escape') then
         love.event.quit()

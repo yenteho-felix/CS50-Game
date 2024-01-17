@@ -1,3 +1,9 @@
+--[[
+    GD50 - Breakout
+
+    a basic StateMachine class which will allow us to transition to and from
+    game states smoothly and avoid monolithic code in one file
+]]
 StateMachine = Class{}
 
 function StateMachine:init(states)
