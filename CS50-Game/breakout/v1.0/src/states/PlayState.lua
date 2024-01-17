@@ -19,6 +19,9 @@ function PlayState:init()
     self.ball.y = VIRTUAL_HEIGHT / 2 - self.ball.height / 2
     self.ball.dx = math.random(-200, 200)
     self.ball.dy = math.random(-50, -60)
+
+    -- use createMap function to generate a bricks table
+    self.bricks = LevelMaker.createMap()
 end
 
 function PlayState:update(dt)
@@ -52,11 +55,24 @@ function PlayState:update(dt)
         self.ball.dy = -self.ball.dy
         gSounds['paddle-hit']:play()
     end
+
+    -- ball collision across all bricks
+    -- only check collision when the brick is inPlay
+    for k, brick in pairs(self.bricks) do
+        if brick.inPlay and self.ball:collides(brick) then
+            brick:hit()
+        end
+    end
 end
 
 function PlayState:render()
     self.paddle:render()
+
     self.ball:render()
+
+    for k, brick in pairs(self.bricks) do
+        brick:render()
+    end
 
     -- pause text
     if self.paused then

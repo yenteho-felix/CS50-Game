@@ -32,6 +32,24 @@ function GenerateQuads(atlas, tileWidth, tileHeight)
     return spriteSheet
 end
 
+-- Slicing tables and return subset
+function table.slice(tbl, first, last, step)
+    local sliced = {}
+
+    for i = first or 1, last or #tbl, step or 1 do
+        sliced[#sliced+1] = tbl[i]
+    end
+
+    return sliced
+end
+
+-- This function is specially made to piece out the bricks from the sprite sheet.
+-- Since bricks are positioned from 0,0 and they are regular in sizes so we can 
+-- use different way to extract them
+function GenerateQuadsBricks(atlas)
+    return table.slice(GenerateQuads(atlas, 32, 16), 1, 21)
+end
+
 -- This function is specially made to piece out the paddles from the sprite sheet.
 -- For this, we have to piece out the paddles manually since they are all different sizes
 function GenerateQuadsPaddles(atlas)
@@ -94,6 +112,6 @@ function GenerateQuadsBalls(atlas)
         x = x + ballWidth
         counter = counter + 1
     end
-    
+
     return quads
 end
