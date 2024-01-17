@@ -17,8 +17,9 @@ Class = require 'lib/class'
 
 -- Classes developed for this main program
 require 'src/constants'
-require 'src/Paddle'
 require 'src/Utils'
+require 'src/Paddle'
+require 'src/Ball'
 
 -- each of the individual states our game can be in at once; each state has
 -- its own update and render methods that can be called by our state machine

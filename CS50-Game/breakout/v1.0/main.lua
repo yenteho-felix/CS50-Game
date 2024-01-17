@@ -50,12 +50,13 @@ function love.load()
         ['main'] = love.graphics.newImage('images/breakout.png'),
         ['arrows'] = love.graphics.newImage('images/arrows.png'),
         ['hearts'] = love.graphics.newImage('images/hearts.png'),
-        ['particle'] = love.graphics.newImage('images/particle.png')      
+        ['particle'] = love.graphics.newImage('images/particle.png'),
     }
 
     -- Quads we will generate for all of our textures
     gFrames = {
-        ['paddles'] = GenerateQuadsPaddles(gTextures['main'])
+        ['paddles'] = GenerateQuadsPaddles(gTextures['main']),
+        ['balls'] = GenerateQuadsBalls(gTextures['main']),
     }
 
     -- initialize sounds

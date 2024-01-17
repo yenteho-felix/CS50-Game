@@ -66,3 +66,34 @@ function GenerateQuadsPaddles(atlas)
     
     return quads
 end
+
+-- This function is specially made to piece out the balls from the sprite sheet.
+-- For this, we have to piece out the balls manually by their location
+function GenerateQuadsBalls(atlas)
+    local x = 32 * 3    -- x location of targeted ball in atlas
+    local y = 16 * 3    -- y location of targeted ball in atlas
+                        -- initialize x, y by the location of first ball (upper-left)
+
+    local counter = 1
+    local quads = {}
+
+    -- first row of the ball
+    local ballWidth = 8
+    local ballHeight = 8
+    for i = 0, 3 do
+        quads[counter] = love.graphics.newQuad(x, y, ballWidth, ballHeight, atlas:getDimensions())
+        x = x + ballWidth
+        counter = counter + 1
+    end
+
+    -- second row of the ball
+    x = 32 * 3
+    y = 16 * 3 + ballHeight
+    for i = 0, 2 do
+        quads[counter] = love.graphics.newQuad(x, y, ballWidth, ballHeight, atlas:getDimensions())
+        x = x + ballWidth
+        counter = counter + 1
+    end
+    
+    return quads
+end
