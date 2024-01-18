@@ -19,9 +19,9 @@ end
 
 function StateMachine:change(stateName, enterParams)
     assert(self.states[stateName])                  -- state mus exist, otherwise assert an error
-    self.current = self.states[stateName]()
-    self.current:exit()
-    self.current:enter(enterParams)
+    self.current:exit()                             -- exit current state
+    self.current = self.states[stateName]()         -- change state
+    self.current:enter(enterParams)                 -- enter new state
 end
 
 function StateMachine:update(dt)
