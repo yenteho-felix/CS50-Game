@@ -59,16 +59,35 @@ end
 -- expects an argument with a bounding box, be a paddle or a brick,
 -- and returns true ifthe bounding boxes of this and the argument overlap.
 function Ball:collides(target)
+    local overlap = true
+    local shiftX = 0
+    local shiftY = 0
+
     -- check left and right edge
     if self.x > target.x + target.width or target.x > self.x + self.width then
-        return false
+        overlap = false
     end
     -- check top and bottom edge
     if self.y > target.y + target.height or target.y > self.y + self.height then
-        return false
+        overlap = false
     end
 
-    return true
+    -- calculate shiftX and shiftY of ball to move it toward edge of the paddle
+    -- ball hits left side of target
+    if (self.x + self.width / 2) < (target.x + target.width / 2) then
+        shiftX = target.x - self.x - self.width
+    -- ball hits right side of target 
+    else
+        shiftX = target.x + target.width - self.x
+    end
+    -- ball hits top side of target
+    if (self.y + self.height / 2) < (target.y + target.y / 2) then
+        shiftY = target.y - self.y - self.height
+    else
+        shiftY = target.y + target.height - self.y
+    end
+
+    return overlap, shiftX, shiftY
 end
 
 -- place the ball in the middle of the screen
