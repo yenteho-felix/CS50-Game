@@ -58,6 +58,7 @@ function love.load()
         ['paddles'] = GenerateQuadsPaddles(gTextures['main']),
         ['balls'] = GenerateQuadsBalls(gTextures['main']),
         ['bricks'] = GenerateQuadsBricks(gTextures['main']),
+        ['hearts'] = GenerateQuads(gTextures['hearts'], 10, 9),
     }
 
     -- initialize sounds
@@ -83,6 +84,8 @@ function love.load()
     gStateMachine = StateMachine {
         ['start'] = function() return StartState() end,
         ['play'] = function() return PlayState() end,
+        ['serve'] = function() return ServeState() end,
+        ['game-over'] = function() return GameOverState() end,
     }
     gStateMachine:change('start')
 
@@ -114,7 +117,7 @@ function love.draw()
     gStateMachine:render()
 
     -- FPS
-    displayFPS()
+    RenderFPS()
 
     Push:apply('end')
 end
@@ -138,10 +141,4 @@ function renderBackground()
         VIRTUAL_WIDTH / (backgroundWidth - 1),      -- scale factors on x
         VIRTUAL_HEIGHT / (backgroundHeight - 1)     -- scale factors on y
     )
-end
-
-function displayFPS()
-    love.graphics.setFont(gFonts['small'])
-    love.graphics.setColor(0, 1, 0, 1)
-    love.graphics.printf('FPS: ' .. tostring(love.timer.getFPS()), 5, 5, VIRTUAL_WIDTH, 'left')
 end

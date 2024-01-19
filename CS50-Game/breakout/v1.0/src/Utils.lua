@@ -115,3 +115,33 @@ function GenerateQuadsBalls(atlas)
 
     return quads
 end
+
+function RenderHealth(health)
+    local healthX = VIRTUAL_WIDTH - 100
+    local healthY = 4
+    local healthInterval = 11
+
+    -- render active health
+    for i = 1, health do
+        love.graphics.draw(gTextures['hearts'], gFrames['hearts'][1], healthX, healthY)
+        healthX = healthX + healthInterval
+    end
+
+    -- render missing health
+    for i = 1, 3 - health do
+        love.graphics.draw(gTextures['hearts'], gFrames['hearts'][2], healthX, healthY)
+        healthX = healthX + healthInterval
+    end
+end
+
+function RenderScore(score)
+    love.graphics.setFont(gFonts['small'])
+    love.graphics.print('Score:', VIRTUAL_WIDTH - 60, 5)
+    love.graphics.printf(tostring(score), VIRTUAL_WIDTH - 50, 5, 40, 'right')
+end
+
+function RenderFPS()
+    love.graphics.setFont(gFonts['small'])
+    love.graphics.setColor(0, 1, 0, 1)
+    love.graphics.printf('FPS: ' .. tostring(love.timer.getFPS()), 5, 5, VIRTUAL_WIDTH, 'left')
+end

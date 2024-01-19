@@ -15,12 +15,15 @@ function Ball:init(skin)
     self.width = 8
     self.height = 8
 
-    -- x and y velocity
-    self.dx = 0
-    self.dy = 0
-
     -- skin number
     self.skin = skin
+
+    -- initialize ball at the center
+    -- give ball random starting velocity toward bricks
+    self.x = VIRTUAL_WIDTH / 2 - self.width / 2
+    self.y = VIRTUAL_HEIGHT / 2 - self.height / 2
+    self.dx = math.random(-200, 200)
+    self.dy = math.random(-50, -60)
 end
 
 function Ball:update(dt)

@@ -46,7 +46,15 @@ function keyboardHandling()
         gSounds['confirm']:play()
 
         if highlighted == 1 then
-            gStateMachine:change('play')
+            gStateMachine:change('serve',
+                {
+                    paddle = Paddle(1),
+                    bricks = LevelMaker.createMap(),
+                    health = 3,
+                    score = 0,
+                    skin = math.random(7)
+                }
+            )
         end
     end
 

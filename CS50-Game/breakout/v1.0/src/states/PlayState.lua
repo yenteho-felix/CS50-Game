@@ -9,23 +9,19 @@
 PlayState = Class{__includes = BaseState}
 
 function PlayState:init()
-    self.paddle = Paddle()
-    self.ball = Ball(1)         -- initialze ball with skin 1
     self.paused = false
+end
 
-    -- initialize ball at the center
-    -- give ball random starting velocity toward bricks
-    self.ball.x = VIRTUAL_WIDTH / 2 - self.ball.width / 2
-    self.ball.y = VIRTUAL_HEIGHT / 2 - self.ball.height / 2
-    self.ball.dx = math.random(-200, 200)
-    self.ball.dy = math.random(-50, -60)
-
-    -- use createMap function to generate a bricks table
-    self.bricks = LevelMaker.createMap()
+function PlayState:enter(params)
+    self.paddle = params.paddle
+    self.bricks = params.bricks
+    self.health = params.health
+    self.score = params.score
+    self.ball = params.ball
 end
 
 -- ball bounce back when collides with paddle
-function BallCollideWithPaddle(self)
+function ballCollideWithPaddle(self)
     local collide, shiftX, shiftY = self.ball:collides(self.paddle)
     if collide then
         gSounds['paddle-hit']:play()
@@ -68,7 +64,7 @@ function BallCollideWithPaddle(self)
     end
 end
 
-function BallCollideWithBrick(self)
+function ballCollideWithBrick(self)
     -- ball collision across all bricks
     -- only check collision when the brick is inPlay
     for k, brick in pairs(self.bricks) do
@@ -76,6 +72,7 @@ function BallCollideWithBrick(self)
 
         if brick.inPlay and collide then
             brick:hit()
+            self.score = self.score + 10
 
             -- 
             -- Collision code for bricks
@@ -109,6 +106,27 @@ function BallCollideWithBrick(self)
     end
 end
 
+function ballCollideWithBottom(self)
+    if self.ball.y >= VIRTUAL_HEIGHT then
+        self.health = self.health - 1
+        gSounds['hurt']:play()
+
+        if self.health == 0 then
+            gStateMachine:change('game-over', {score = self.score})
+        else
+            gStateMachine:change('serve',
+                {
+                    paddle = self.paddle,
+                    bricks = self.bricks,
+                    health = self.health,
+                    score = self.score,
+                    skin = self.ball.skin
+                }
+            )
+        end
+    end
+end
+
 function PlayState:update(dt)
     -- handle pause event before other updates
     if self.paused then
@@ -136,8 +154,9 @@ function PlayState:update(dt)
     self.ball:update(dt)
 
     -- Collision
-    BallCollideWithPaddle(self)
-    BallCollideWithBrick(self)
+    ballCollideWithPaddle(self)
+    ballCollideWithBrick(self)
+    ballCollideWithBottom(self)
 
 end
 
@@ -149,6 +168,10 @@ function PlayState:render()
     for k, brick in pairs(self.bricks) do
         brick:render()
     end
+
+    RenderScore(self.score)
+
+    RenderHealth(self.health)
 
     -- pause text
     if self.paused then
