@@ -24,6 +24,11 @@
     Author: Felix Ho
 ]]
 
+-- enable local lua debugger in debug mode
+if pcall(require, "lldebugger") then
+    require("lldebugger").start()
+end
+
 require 'src/Dependencies'
 
 function love.load()
