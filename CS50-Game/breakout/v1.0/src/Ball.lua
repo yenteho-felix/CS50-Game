@@ -75,19 +75,21 @@ function Ball:collides(target)
         overlap = false
     end
 
-    -- calculate shiftX and shiftY of ball to move it toward edge of the paddle
-    -- ball hits left side of target
-    if (self.x + self.width / 2) < (target.x + target.width / 2) then
-        shiftX = target.x - self.x - self.width
-    -- ball hits right side of target 
-    else
-        shiftX = target.x + target.width - self.x
-    end
-    -- ball hits top side of target
-    if (self.y + self.height / 2) < (target.y + target.y / 2) then
-        shiftY = target.y - self.y - self.height
-    else
-        shiftY = target.y + target.height - self.y
+    if overlap then
+        -- calculate shiftX and shiftY of ball to move it toward edge of the paddle
+        -- ball hits left side of target
+        if (self.x + self.width / 2) < (target.x + target.width / 2) then
+            shiftX = target.x - self.x - self.width
+        -- ball hits right side of target 
+        else
+            shiftX = target.x + target.width - self.x
+        end
+        -- ball hits top side of target
+        if (self.y + self.height / 2) < (target.y + target.y / 2) then
+            shiftY = target.y - self.y - self.height
+        else
+            shiftY = target.y + target.height - self.y
+        end
     end
 
     return overlap, shiftX, shiftY
