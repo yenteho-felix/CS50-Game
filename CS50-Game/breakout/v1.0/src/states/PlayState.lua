@@ -72,7 +72,7 @@ function ballCollideWithBrick(self)
 
         if brick.inPlay and collide then
             brick:hit()
-            self.score = self.score + 10
+            self.score = self.score + (brick.tier * 200 + brick.color * 25)
 
             -- 
             -- Collision code for bricks
