@@ -8,8 +8,12 @@ StartState = Class{__includes = BaseState}
 
 local highlighted = 1
 
+function StartState:enter(params)
+    self.highScores = params.highScores
+end
+
 function StartState:update(dt)
-    keyboardHandling()
+    keyboardHandling(self)
 end
 
 function StartState:render()
@@ -34,7 +38,7 @@ function StartState:render()
     love.graphics.setColor(1, 1, 1, 1)
 end
 
-function keyboardHandling()
+function keyboardHandling(self)
     -- toggle highlighted option if we press an arrow key up or down
     if love.keyboard.wasPressed('up') or love.keyboard.wasPressed('down') then
         highlighted = highlighted == 1 and 2 or 1
@@ -45,6 +49,7 @@ function keyboardHandling()
     if love.keyboard.wasPressed('return') or love.keyboard.wasPressed('enter') then
         gSounds['confirm']:play()
 
+        -- play game; enter serve state
         if highlighted == 1 then
             gStateMachine:change('serve',
                 {
@@ -54,6 +59,15 @@ function keyboardHandling()
                     health = 3,
                     score = 0,
                     skin = math.random(7)
+                }
+            )
+        end
+
+        -- see score; enter high-score state
+        if highlighted == 2 then
+            gStateMachine:change('high-score',
+                {
+                    highScores = self.highScores
                 }
             )
         end

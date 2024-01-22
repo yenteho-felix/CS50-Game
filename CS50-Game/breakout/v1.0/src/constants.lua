@@ -14,3 +14,7 @@ VIRTUAL_HEIGHT = 243
 
 -- paddle moement speed
 PADDLE_SPEED = 200
+
+-- where we store score file
+SCORE_FOLDER = 'breakout'
+SCORE_FILE = 'breakout.lst'

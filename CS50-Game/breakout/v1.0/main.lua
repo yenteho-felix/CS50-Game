@@ -92,8 +92,13 @@ function love.load()
         ['serve'] = function() return ServeState() end,
         ['game-over'] = function() return GameOverState() end,
         ['victory'] = function() return VictoryState() end,
+        ['high-score'] = function() return HighScoreState() end,
     }
-    gStateMachine:change('start')
+    gStateMachine:change('start',
+        {
+            highScores = loadHighScores()
+        }
+    )
 
     -- seed the RNG
     math.randomseed(os.time())
@@ -147,4 +152,45 @@ function renderBackground()
         VIRTUAL_WIDTH / (backgroundWidth - 1),      -- scale factors on x
         VIRTUAL_HEIGHT / (backgroundHeight - 1)     -- scale factors on y
     )
+end
+
+function loadHighScores()
+    -- set folder
+    love.filesystem.setIdentity(SCORE_FOLDER)
+
+    -- if the file doesn't exist, initialize it with some default scores
+    if not love.filesystem.getInfo(SCORE_FILE) then
+        local scores = ''
+        for i = 10, 1, -1 do
+            scores = scores .. 'CTO\n'
+            scores = scores .. tostring(i * 100) .. '\n'
+        end
+        love.filesystem.write(SCORE_FILE, scores)
+    end
+
+    -- initialize scores table with 10 blank entries
+    local scores = {}
+    for i = 1, 10 do
+        scores[i] = {
+            name = nil,
+            score = nil
+        }
+    end
+
+    -- read name and score from scoreFile
+    -- iterate over each line in the file, filling the names and scores to table
+    local name = true
+    local counter = 1
+
+    for line in love.filesystem.lines(SCORE_FILE) do
+        if name then
+            scores[counter].name = string.sub(line, 1, 3)
+        else
+            scores[counter].score = tonumber(line)
+            counter = counter + 1
+        end
+        name = not name
+    end
+
+    return scores
 end
