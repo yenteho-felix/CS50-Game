@@ -48,8 +48,9 @@ function keyboardHandling()
         if highlighted == 1 then
             gStateMachine:change('serve',
                 {
+                    level = 1,
                     paddle = Paddle(1),
-                    bricks = LevelMaker.createMap(10),
+                    bricks = LevelMaker.createMap(1),
                     health = 3,
                     score = 0,
                     skin = math.random(7)

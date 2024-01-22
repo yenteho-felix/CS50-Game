@@ -13,11 +13,23 @@ function PlayState:init()
 end
 
 function PlayState:enter(params)
+    self.level = params.level
     self.paddle = params.paddle
     self.bricks = params.bricks
     self.health = params.health
     self.score = params.score
     self.ball = params.ball
+end
+
+-- check victory
+function checkVictory(self)
+    for k, brick in pairs(self.bricks) do
+        if brick.inPlay then
+            return false
+        end
+    end
+
+    return true
 end
 
 -- ball bounce back when collides with paddle
@@ -116,6 +128,7 @@ function ballCollideWithBottom(self)
         else
             gStateMachine:change('serve',
                 {
+                    level = self.level,
                     paddle = self.paddle,
                     bricks = self.bricks,
                     health = self.health,
@@ -144,7 +157,14 @@ function PlayState:update(dt)
         end
     end
 
-    -- exit event
+    -- jump to next level
+    if love.keyboard.wasPressed('tab') then
+        for k, brick in pairs(self.bricks) do
+            brick.inPlay = false
+        end
+    end
+
+    -- -- exit event
     if love.keyboard.wasPressed('escape') then
         love.event.quit()
     end
@@ -162,6 +182,21 @@ function PlayState:update(dt)
     ballCollideWithPaddle(self)
     ballCollideWithBrick(self)
     ballCollideWithBottom(self)
+
+    -- victory check
+    if checkVictory(self) then
+        gSounds['victory']:play()
+
+        gStateMachine:change('victory',
+            {
+                level = self.level,
+                paddle = self.paddle,
+                health = self.health,
+                score = self.score,
+                ball = self.ball
+            }
+        )
+    end
 end
 
 function PlayState:render()

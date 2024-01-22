@@ -8,6 +8,7 @@ ServeState = Class{__includes = BaseState}
 
 -- requires parameters 'paddle, bricks, health, score'
 function ServeState:enter(params)
+    self.level = params.level
     self.paddle = params.paddle
     self.bricks = params.bricks
     self.health = params.health
@@ -25,6 +26,7 @@ function ServeState:update(dt)
     if love.keyboard.wasPressed('enter') or love.keyboard.wasPressed('return') then
         gStateMachine:change('play',
         {
+            level = self.level,
             paddle = self.paddle,
             bricks = self.bricks,
             health = self.health,
@@ -53,6 +55,8 @@ function ServeState:render()
 
     RenderHealth(self.health)
 
+    love.graphics.setFont(gFonts['large'])
+    love.graphics.printf('Level ' .. tostring(self.level), 0, VIRTUAL_HEIGHT / 3, VIRTUAL_WIDTH, 'center')
     love.graphics.setFont(gFonts['medium'])
     love.graphics.printf('Press "Enter" to serve!', 0, VIRTUAL_HEIGHT / 2, VIRTUAL_WIDTH, 'center')
 end

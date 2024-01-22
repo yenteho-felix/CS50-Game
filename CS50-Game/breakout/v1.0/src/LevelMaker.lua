@@ -12,17 +12,17 @@ LevelMaker = Class{}
 
 
 -- random pattern generation based on given level
--- game starts at level 0, tier increases every 5 levels
+-- game starts at level 1, tier increases every 5 levels
 -- ex:
---      level 0  : 3 color and 0 tier
---      level 1  : 4 color and 0 tier
+--      level 1  : 3 color and 0 tier
+--      level 2  : 4 color and 0 tier
 --      level 5  : 3 color and 1 tier
 --      level 10 : 3 color and 2 tier
 function genPattern(level)
     -- color level range from 1 to 6, but we dont use 6 since
     -- 6 is reserved to be used as a wall brick
     -- maximum 3 colors at level 1
-    local highestColor = math.min(5, level % 5 + 3)
+    local highestColor = math.min(5, level % 5 + 2)
 
     -- tier level range from 0 to 3
     -- increases one tier every 5 levels
