@@ -153,11 +153,15 @@ function PlayState:update(dt)
     self.paddle:update(dt)
     self.ball:update(dt)
 
+    -- Partical
+    for k, brick in pairs(self.bricks) do
+        brick:update(dt)
+    end
+
     -- Collision
     ballCollideWithPaddle(self)
     ballCollideWithBrick(self)
     ballCollideWithBottom(self)
-
 end
 
 function PlayState:render()
@@ -167,6 +171,10 @@ function PlayState:render()
 
     for k, brick in pairs(self.bricks) do
         brick:render()
+    end
+
+    for k, brick in pairs(self.bricks) do
+        brick:renderParticles()
     end
 
     RenderScore(self.score)

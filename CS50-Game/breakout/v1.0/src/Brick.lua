@@ -12,6 +12,15 @@
 
 Brick = Class{}
 
+-- colors that matches the brick, to be used with partical system
+paletteColors = {
+    [1] = {['r'] = 99,  ['g'] = 155, ['b'] = 255},      -- blue
+    [2] = {['r'] = 106, ['g'] = 190, ['b'] = 47},       -- green
+    [3] = {['r'] = 217, ['g'] = 87,  ['b'] = 99},       -- red
+    [4] = {['r'] = 215, ['g'] = 123, ['b'] = 186},      -- purple
+    [5] = {['r'] = 251, ['g'] = 242, ['b'] = 54},       -- gold
+}
+
 function Brick:init(x, y)
     self.x = x
     self.y = y
@@ -24,9 +33,17 @@ function Brick:init(x, y)
 
     -- used to determine whether this brick should be rendered
     self.inPlay = true
+
+    -- https://love2d.org/wiki/ParticleSystem
+    -- particle system emitted on hit
+    self.psystem = love.graphics.newParticleSystem(gTextures['particle'], 64)
+    self.psystem:setParticleLifetime(0.5, 1)
+    self.psystem:setLinearAcceleration(15, 0, 15, 80)
+    self.psystem:setEmissionArea('normal', 10, 10)
 end
 
 function Brick:update(dt)
+    self.psystem:update(dt)
 end
 
 function Brick:render()
@@ -40,9 +57,29 @@ function Brick:render()
     end
 end
 
+-- Need a dedicate particle system outside of render function since
+-- it needed to be draw on on top of brick
+function Brick:renderParticles()
+    love.graphics.draw(self.psystem, self.x + 16, self.y + 8)
+end
+
 -- triggers a hit on the brick, taking it out of play if at 0 health
 -- or changing its color otherwise.
 function Brick:hit()
+    -- partical
+    self.psystem:setColors(
+        paletteColors[self.color].r / 255,
+        paletteColors[self.color].g / 255,
+        paletteColors[self.color].b / 255,
+        55 * (self.tier + 1) / 255,
+        paletteColors[self.color].r / 255,
+        paletteColors[self.color].g / 255,
+        paletteColors[self.color].b / 255,
+        0 / 255
+    )
+    self.psystem:emit(32)
+
+    -- sounds
     gSounds['brick-hit-2']:stop()
     gSounds['brick-hit-2']:play()
 
