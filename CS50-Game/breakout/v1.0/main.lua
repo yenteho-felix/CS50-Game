@@ -102,6 +102,10 @@ function love.load()
         }
     )
 
+    -- backgound music
+    gSounds['music']:play()
+    gSounds['music']:setLooping(true)
+
     -- seed the RNG
     math.randomseed(os.time())
 
