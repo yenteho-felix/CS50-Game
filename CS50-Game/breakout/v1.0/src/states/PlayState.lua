@@ -13,6 +13,7 @@ function PlayState:init()
 end
 
 function PlayState:enter(params)
+    self.highScores = params.highScores
     self.level = params.level
     self.paddle = params.paddle
     self.bricks = params.bricks
@@ -124,16 +125,22 @@ function ballCollideWithBottom(self)
         gSounds['hurt']:play()
 
         if self.health == 0 then
-            gStateMachine:change('game-over', {score = self.score})
+            gStateMachine:change('game-over', 
+                {
+                    highScores = self.highScores,
+                    score = self.score,
+                }
+            )
         else
             gStateMachine:change('serve',
                 {
+                    highScores = self.highScores,
                     level = self.level,
                     paddle = self.paddle,
                     bricks = self.bricks,
                     health = self.health,
                     score = self.score,
-                    skin = self.ball.skin
+                    skin = self.ball.skin,
                 }
             )
         end
@@ -189,6 +196,7 @@ function PlayState:update(dt)
 
         gStateMachine:change('victory',
             {
+                highScores = self.highScores,
                 level = self.level,
                 paddle = self.paddle,
                 health = self.health,

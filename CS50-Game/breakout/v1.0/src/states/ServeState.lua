@@ -8,6 +8,7 @@ ServeState = Class{__includes = BaseState}
 
 -- requires parameters 'paddle, bricks, health, score'
 function ServeState:enter(params)
+    self.highScores = params.highScores
     self.level = params.level
     self.paddle = params.paddle
     self.bricks = params.bricks
@@ -25,14 +26,15 @@ function ServeState:update(dt)
     -- goto 'play' state
     if love.keyboard.wasPressed('enter') or love.keyboard.wasPressed('return') then
         gStateMachine:change('play',
-        {
-            level = self.level,
-            paddle = self.paddle,
-            bricks = self.bricks,
-            health = self.health,
-            score = self.score,
-            ball = self.ball
-        }
+            {
+                highScores = self.highScores,
+                level = self.level,
+                paddle = self.paddle,
+                bricks = self.bricks,
+                health = self.health,
+                score = self.score,
+                ball = self.ball,
+            }
         )
     end
 

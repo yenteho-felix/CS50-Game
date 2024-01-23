@@ -7,6 +7,7 @@
 VictoryState = Class{__includes = BaseState}
 
 function VictoryState:enter(params)
+    self.highScores = params.highScores
     self.level = params.level
     self.score = params.score
     self.health = params.health
@@ -18,6 +19,7 @@ function VictoryState:update(dt)
     if love.keyboard.wasPressed('enter') or love.keyboard.wasPressed('return') then
         gStateMachine:change('serve',
             {
+                highScores = self.highScores,
                 level = self.level + 1,
                 bricks = LevelMaker.createMap(self.level + 1),
                 paddle = self.paddle,

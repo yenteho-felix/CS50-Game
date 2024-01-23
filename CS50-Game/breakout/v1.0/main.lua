@@ -81,7 +81,6 @@ function love.load()
         ['recover'] = love.audio.newSource('sounds/recover.wav', 'static'),
         ['high-score'] = love.audio.newSource('sounds/high_score.wav', 'static'),
         ['pause'] = love.audio.newSource('sounds/pause.wav', 'static'),
-
         ['music'] = love.audio.newSource('sounds/music.wav', 'static')
     }
 
@@ -93,6 +92,7 @@ function love.load()
         ['game-over'] = function() return GameOverState() end,
         ['victory'] = function() return VictoryState() end,
         ['high-score'] = function() return HighScoreState() end,
+        ['enter-high-score'] = function() return EnterHighScoreState() end,
     }
     gStateMachine:change('start',
         {
@@ -160,12 +160,12 @@ function loadHighScores()
 
     -- if the file doesn't exist, initialize it with some default scores
     if not love.filesystem.getInfo(SCORE_FILE) then
-        local scores = ''
+        local scoresStr = ''
         for i = 10, 1, -1 do
-            scores = scores .. 'CTO\n'
-            scores = scores .. tostring(i * 100) .. '\n'
+            scoresStr = scoresStr .. 'CTO\n'
+            scoresStr = scoresStr .. tostring(i * 100) .. '\n'
         end
-        love.filesystem.write(SCORE_FILE, scores)
+        love.filesystem.write(SCORE_FILE, scoresStr)
     end
 
     -- initialize scores table with 10 blank entries
