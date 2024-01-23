@@ -85,7 +85,7 @@ function Ball:collides(target)
             shiftX = target.x + target.width - self.x
         end
         -- ball hits top side of target
-        if (self.y + self.height / 2) < (target.y + target.y / 2) then
+        if (self.y + self.height / 2) < (target.y + target.height / 2) then
             shiftY = target.y - self.y - self.height
         else
             shiftY = target.y + target.height - self.y
