@@ -171,7 +171,7 @@ function PlayState:update(dt)
         end
     end
 
-    -- -- exit event
+    -- exit event
     if love.keyboard.wasPressed('escape') then
         love.event.quit()
     end

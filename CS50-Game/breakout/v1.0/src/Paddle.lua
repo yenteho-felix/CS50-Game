@@ -11,9 +11,9 @@
 
 Paddle = Class()
 
-function Paddle:init()
+function Paddle:init(skin)
     -- paddle skin
-    self.skin = 1
+    self.skin = skin
 
     -- paddle size. there are 4 sizes to choose from and default to the medium size
     self.size = 2

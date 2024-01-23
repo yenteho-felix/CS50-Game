@@ -51,15 +51,9 @@ function keyboardHandling(self)
 
         -- play game; enter serve state
         if highlighted == 1 then
-            gStateMachine:change('serve',
+            gStateMachine:change('paddle-select',
                 {
-                    highScores = self.highScores,
-                    level = 1,
-                    paddle = Paddle(1),
-                    bricks = LevelMaker.createMap(1),
-                    health = 3,
-                    score = 0,
-                    skin = math.random(7),
+                    highScores = self.highScores
                 }
             )
         end
