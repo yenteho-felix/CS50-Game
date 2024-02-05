@@ -20,7 +20,8 @@ function Tile:init(row, col)
 
     -- Tile color and pattern, generated randomly
     self.color = math.random(TILE_COLORS)
-    self.pattern = math.random(TILE_PATTERNS)
+    self.pattern = math.random(1)
+    -- self.pattern = math.random(TILE_PATTERNS)
 end
 
 function Tile:render(boardX, boardY)

@@ -42,9 +42,6 @@ function StartState:init()
     -- Create a match board on the center of the screen
     self.board = Board((VIRTUAL_WIDTH - 8 * 32) / 2, 16)
 
-    -- Initialize alpha as fully transparanet at the begining
-    self.alpha = 0
-
     -- if we've selected an option, we need to pause input while we animate out
     self.pauseInput = false
 end
@@ -72,7 +69,7 @@ function StartState:render()
     -- self.board:render()
     self:renderMatch3Title(-16)
     self:renderOptions(16)
-    self:renderTransitionEffect()
+    -- self:renderTransitionEffect()
 end
 
 -- Draw the title text "MATCH 3" with changing colors
@@ -126,13 +123,6 @@ function StartState:renderMenuItem(text, itemIndex, y)
     love.graphics.printf(text, 0, y, VIRTUAL_WIDTH, 'center')
 end
 
--- Transition effeect
-function StartState:renderTransitionEffect()
-    -- Set to fully transparent, and tween it to full opaque
-    love.graphics.setColor(1, 1, 1, self.alpha)
-    love.graphics.rectangle('fill', 0, 0, VIRTUAL_WIDTH, VIRTUAL_HEIGHT)
-end
-
 -- Check for quit input
 function StartState:checkQuitInput()
     if love.keyboard.wasPressed('escape') then
@@ -178,15 +168,8 @@ end
 
 -- Transition to the 'Begin Game' state
 function StartState:transitionToBeginGame()
-    -- Transition alpha to 1 over 1 second
-    Timer.tween(1, { [self] = {alpha = 1} })
-
-    -- After alpha transition, move to begin-game state
-    :finish(function()
-        gStateMachine:change('begin-game', { level = 1 })
-        self.colorTimer:remove()
-    end)
-
+    gStateMachine:change('begin-game', { level = 1 })
+    self.colorTimer:remove()
     self.pauseInput = true  -- Turn off input during transition
 end
 

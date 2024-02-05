@@ -46,6 +46,9 @@ VIRTUAL_HEIGHT = 288
 -- speed at which our background texture will scroll
 BACKGROUND_SCROLL_SPEED = 20
 
+-- initial timer for each game
+INIT_TIMER = 60
+
 -- tile colors and patterns
 TILE_COLORS = 18
 TILE_PATTERNS = 6

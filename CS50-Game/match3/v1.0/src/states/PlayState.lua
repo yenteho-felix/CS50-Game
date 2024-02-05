@@ -12,7 +12,7 @@ function PlayState:init()
     self.level = 1
     self.score = 0
     self.scoreGoal = 0
-    self.timer = 20
+    self.timer = INIT_TIMER
     self.paused = false
 
     -- position of the board
@@ -26,6 +26,10 @@ function PlayState:init()
     -- tile object highlighted to be swap
     self.highlightedTile = nil
 
+    -- Flag to show whether we're able to process input
+    self.canInput = true
+
+    -- timer count down
     self:timerCountDown()
 end
 
@@ -51,9 +55,15 @@ function PlayState:update(dt)
 
     -- Game loop
     if not self.paused then
-        self:playGame()
-        self:enterGameOver()
-        self:enterNextLevel()
+        -- Check if matches happened at the begining of the game
+        -- self:calculateMatches()
+
+        -- Not in match calaulation/annimation stage
+        if self.canInput then
+            self:playGame()
+            self:enterGameOver()
+            self:enterNextLevel()
+        end
 
         Timer.update(dt)
     end
@@ -81,8 +91,11 @@ function PlayState:playGame()
     -- cursor movement
     self:moveCursor()
 
-    -- tile selected
+    -- select tiles and do swap
     self:tileSelected()
+
+    -- calculate matches after the swap
+    self:calculateMatches()
 end
 
 -- User move cursor up/down/left/right to move between tiles
@@ -143,8 +156,48 @@ function PlayState:tileSelected()
         -- If a tile is highlighted and current tile is not the highted one, do swap
         else
             self:swapTiles(self.highlightedTile, self.board.tiles[row][col])
-            -- self:calculateMatches()
         end
+    end
+end
+
+--[[
+    Calculates whether any matches were found on the board and tweens the needed
+    tiles to their new destinations if so. Also removes tiles from the board that
+    have matched and replaces them with new randomized tiles, deferring most of this
+    to the Board class.
+]]
+function PlayState:calculateMatches()
+    -- calculate score
+    local function calculateScore(matches)
+        local score = 0
+        for k, match in pairs(matches) do
+            score = score + #match * 50
+        end
+        return score
+    end
+
+    -- check matches
+    local matches = self.board:calculateMatches()
+    if matches then
+        -- self.canInput = false
+        
+        gSounds['match']:stop()
+        gSounds['match']:play()
+
+        self.score = self.score + calculateScore(matches)
+
+        self.board:removeMatches()
+
+        -- -- Tween new tiles that spawn from the ceiling over 0.25s, 
+        -- local tilesToFall = self.board:getFallingTiles()
+        -- Timer.tween(0.25, tilesToFall)
+        -- :finish(function()
+
+        --     -- Call calculateMatches recursively
+        --     self:calculateMatches()
+        -- end)
+    else
+        -- self.canInput = true
     end
 end
 

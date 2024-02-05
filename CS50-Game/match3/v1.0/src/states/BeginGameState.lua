@@ -11,7 +11,7 @@ BeginGameState = Class{__includes = BaseState}
 
 function BeginGameState:init()
     -- start our transition alpha at full
-    self.alpha = 1
+    self.alpha = 0
 
     -- start the level label Y location off-screen
     self.levelLabelY = -64
@@ -21,23 +21,28 @@ function BeginGameState:enter(params)
     self.level = params.level
     self.score = params.score
 
-    -- Transition alpha to 0 over 1 second
-    Timer.tween(1, {[self] = {alpha = 0}})
-
-    -- After alpha transition, move the text label to the center of the screen over 0.25 seconds
+    -- Transition alpha to 1 over 1 second
+    Timer.tween(1, { [self] = {alpha = 1} })
     :finish(function()
-        Timer.tween(0.25, {[self] = {levelLabelY = VIRTUAL_HEIGHT / 2 - 8}})
 
-        -- Pause for one second with Timer.after
+        -- Transition alpha to 0 over 1 second
+        Timer.tween(1, {[self] = {alpha = 0}})
+
+        -- After alpha transition, move the text label to the center of the screen over 0.25 seconds
         :finish(function()
-            Timer.after(1, function()
+            Timer.tween(0.25, {[self] = {levelLabelY = VIRTUAL_HEIGHT / 2 - 8}})
 
-                -- Animate the label going down past the bottom edge over 0.25 seconds
-                Timer.tween(0.25, {[self] = {levelLabelY = VIRTUAL_HEIGHT + 64}})
+            -- Pause for one second with Timer.after
+            :finish(function()
+                Timer.after(1, function()
 
-                -- Once animation is complete, change to 'play' state
-                :finish(function()
-                    gStateMachine:change('play', {level = self.level, score = self.score})
+                    -- Animate the label going down past the bottom edge over 0.25 seconds
+                    Timer.tween(0.25, {[self] = {levelLabelY = VIRTUAL_HEIGHT + 64}})
+
+                    -- Once animation is complete, change to 'play' state
+                    :finish(function()
+                        gStateMachine:change('play', {level = self.level, score = self.score})
+                    end)
                 end)
             end)
         end)
