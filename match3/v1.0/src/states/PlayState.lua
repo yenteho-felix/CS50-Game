@@ -188,7 +188,14 @@ function PlayState:calculateMatches()
 
         self.board:removeMatches()
 
-        self.board:spawnNewTiles(matches)
+        -- -- Tween new tiles that spawn from the ceiling over 0.25s, 
+        -- local tilesToFall = self.board:getFallingTiles()
+        -- Timer.tween(0.25, tilesToFall)
+        -- :finish(function()
+
+        --     -- Call calculateMatches recursively
+        --     self:calculateMatches()
+        -- end)
     else
         -- self.canInput = true
     end

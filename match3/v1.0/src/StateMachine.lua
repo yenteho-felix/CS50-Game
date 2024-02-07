@@ -22,7 +22,7 @@ function StateMachine:init(states)
     self.current = self.empty
 end
 
-function StateMachine:change(stateName, params)
+function StateMachine:change(stateName, enterParams)
     -- Check if the specified state exists
     if not self.states[stateName] then
         error("State does not exist: " .. stateName)
@@ -35,7 +35,7 @@ function StateMachine:change(stateName, params)
     self.current = self.states[stateName]()
 
     -- Enter the new state with optional parameters
-    self.current:enter(params)
+    self.current:enter(enterParams)
 end
 
 function StateMachine:update(dt)
