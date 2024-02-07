@@ -188,11 +188,27 @@ function Board:removeMatches()
     for k, match in pairs(self.matches) do
         for k, tile in pairs(match) do
             self.tiles[tile.row][tile.col] = nil
+        end
+    end
+    self.matches = nil
+end
+
+-- Spawn new tiles on matche spaces
+function Board:spawnNewTiles(matches)
+    for k, match in pairs(matches) do
+        for k, tile in pairs(match) do
             self.tiles[tile.row][tile.col] = Tile(tile.row, tile.col)
         end
     end
 
-    self.matches = nil
+    -- -- Tween new tiles that spawn from the ceiling over 0.25s, 
+    -- local tilesToFall = self.board:getFallingTiles()
+    -- Timer.tween(0.25, tilesToFall)
+    -- :finish(function()
+
+    --     -- Call calculateMatches recursively
+    --     self:calculateMatches()
+    -- end)
 end
 
 -- Return a table with tween values for tiles that should now fall
