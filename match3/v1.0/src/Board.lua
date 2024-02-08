@@ -59,26 +59,35 @@ end
 function Board:calculateMatches()
     local matches = {}
 
-    -- how many of the same color blocks in a row we've found
-    local matchNum = 1
-
     -- horizontal matches first
     for row = 1, 8 do
-        local col = 1
-        if not self.tiles[row][col] then
-            error('self.tiles[' .. row .. '][' .. col .. '] is nil')
-        end
-        local colorToMatch = self.tiles[row][col].color
-
-        matchNum = 1
+        -- how many of the same color blocks in a row we've found
+        local matchNum = 1
         
+        local startCol = 1
+        while not self.tiles[row][startCol] do
+            -- error('self.tiles[' .. row .. '][' .. col .. '] is nil')
+            startCol = startCol + 1
+        end
+        local colorToMatch = self.tiles[row][startCol].color
+
         -- every horizontal tile
-        for col = 2, 8 do
+        for col = startCol + 1, 8 do
             
             -- if this is the same color as the one we're trying to match...
-            if not self.tiles[row][col] then
-                error('self.tiles[' .. row .. '][' .. col .. '] is nil')
+            while not self.tiles[row][col] do
+                -- error('self.tiles[' .. row .. '][' .. col .. '] is nil')
+                colorToMatch = nil
+                col = col + 1
             end
+
+            -- there's an empty space when colorToMatch is nil, set colorToMatch as color of current tile and move on
+            if not colorToMatch then
+                colorToMatch = self.tiles[row][col].color
+                matchNum = 1
+                goto continue1
+            end
+
             if self.tiles[row][col].color == colorToMatch then
                 matchNum = matchNum + 1
             else
@@ -108,6 +117,8 @@ function Board:calculateMatches()
                     break
                 end
             end
+
+            ::continue1::
         end
 
         -- account for the last row ending with a match
@@ -125,18 +136,29 @@ function Board:calculateMatches()
 
     -- vertical matches
     for col = 1, 8 do
-        local row = 1
-        if not self.tiles[row][col] then
-            error('self.tiles[' .. row .. '][' .. col .. '] is nil')
-        end
-        local colorToMatch = self.tiles[row][col].color
+        -- how many of the same color blocks in a row we've found
+        local matchNum = 1
 
-        matchNum = 1
+        local startRow = 1
+        while not self.tiles[startRow][col] do
+            -- error('self.tiles[' .. row .. '][' .. col .. '] is nil')
+            startRow = startRow + 1
+        end
+        local colorToMatch = self.tiles[startRow][col].color
 
         -- every vertical tile
-        for row = 2, 8 do
-            if not self.tiles[row][col] then
-                error('self.tiles[' .. row .. '][' .. col .. '] is nil')
+        for row = startRow + 1, 8 do
+            while not self.tiles[row][col] do
+                -- error('self.tiles[' .. row .. '][' .. col .. '] is nil')
+                colorToMatch = nil
+                row = row + 1
+            end
+
+            -- there's an empty space when colorToMatch is nil, set colorToMatch as color of current tile and move on
+            if not colorToMatch then
+                colorToMatch = self.tiles[row][col].color
+                matchNum = 1
+                goto continue2
             end
 
             if self.tiles[row][col].color == colorToMatch then
@@ -161,6 +183,8 @@ function Board:calculateMatches()
                     break
                 end
             end
+
+            ::continue2::
         end
 
         -- account for the last column ending with a match
@@ -195,15 +219,15 @@ end
 
 -- Spawn new tiles on matche spaces
 function Board:spawnNewTiles(matches)
-    for k, match in pairs(matches) do
-        for k, tile in pairs(match) do
-            self.tiles[tile.row][tile.col] = Tile(tile.row, tile.col)
-        end
-    end
+    -- for k, match in pairs(matches) do
+    --     for k, tile in pairs(match) do
+    --         self.tiles[tile.row][tile.col] = Tile(tile.row, tile.col)
+    --     end
+    -- end
 
-    -- -- Tween new tiles that spawn from the ceiling over 0.25s, 
-    -- local tilesToFall = self.board:getFallingTiles()
-    -- Timer.tween(0.25, tilesToFall)
+    -- Tween new tiles that spawn from the ceiling over 0.25s, 
+    local tilesToFall = self:getFallingTiles()
+    Timer.tween(0.25, tilesToFall)
     -- :finish(function()
 
     --     -- Call calculateMatches recursively
@@ -263,26 +287,26 @@ function Board:getFallingTiles()
         end
     end
 
-    -- create replacement tiles at the top of the screen
-    for x = 1, 8 do
-        for y = 8, 1, -1 do
-            local tile = self.tiles[y][x]
+    -- -- create replacement tiles at the top of the screen
+    -- for x = 1, 8 do
+    --     for y = 8, 1, -1 do
+    --         local tile = self.tiles[y][x]
 
-            -- if the tile is nil, we need to add a new one
-            if not tile then
+    --         -- if the tile is nil, we need to add a new one
+    --         if not tile then
 
-                -- new tile with random color and variety
-                local tile = Tile(x, y, math.random(18), math.random(6))
-                tile.y = -32
-                self.tiles[y][x] = tile
+    --             -- new tile with random color and variety
+    --             local tile = Tile(x, y, math.random(18), math.random(6))
+    --             tile.y = -32
+    --             self.tiles[y][x] = tile
 
-                -- create a new tween to return for this tile to fall down
-                tweens[tile] = {
-                    y = (tile.row - 1) * 32
-                }
-            end
-        end
-    end
+    --             -- create a new tween to return for this tile to fall down
+    --             tweens[tile] = {
+    --                 y = (tile.row - 1) * 32
+    --             }
+    --         end
+    --     end
+    -- end
 
     return tweens
 end
